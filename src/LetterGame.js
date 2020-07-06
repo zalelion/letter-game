@@ -1,84 +1,102 @@
 import { LitElement, html, css } from 'lit-element';
-import { openWcLogo } from './open-wc-logo.js';
+import anime from 'animejs';
+import { randomLetter } from './randomLetter.js';
 
 export class LetterGame extends LitElement {
   static get properties() {
     return {
-      title: { type: String },
-      page: { type: String },
+      letter: { type: String },
     };
+  }
+
+  constructor() {
+    super();
+    this.letter = randomLetter();
+    this._handle = this._handle.bind(this);
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    document.addEventListener('keyup', this._handle);
+  }
+
+  _handle({ key }) {
+    if (key.length === 1) {
+      if (key === this.letter) {
+        this.letter = randomLetter();
+        const iconDom = this.shadowRoot.querySelector('ion-icon');
+        anime
+        .timeline({
+          targets: [iconDom],
+        })
+        .add({
+          opacity: 1,
+          duration: 200,
+        })
+        .add({
+          opacity: 0,
+          duration: 5000,
+        })
+
+      } else {
+        const letterDom = this.shadowRoot.querySelector('.letter');
+        anime
+          .timeline({
+            targets: [letterDom],
+          })
+          .add({
+            translateX: 10,
+            duration: 200,
+          })
+          .add({
+            translateX: -10,
+            duration: 200,
+          })
+          .add({
+            translateX: 0,
+            duration: 200,
+          });
+      }
+    }
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    document.removeEventListener('keyup', this._handle);
   }
 
   static get styles() {
     return css`
       :host {
-        min-height: 100vh;
+        width: 100%;
+        height: 100%;
+      }
+      .game {
+        width: 100%;
+        height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start;
-        font-size: calc(10px + 2vmin);
-        color: #1a2b42;
-        max-width: 960px;
-        margin: 0 auto;
+      }
+      .letter {
+        line-height: 0;
+        padding: 20px 0;
+        font-size: 200px;
         text-align: center;
       }
-
-      main {
-        flex-grow: 1;
-      }
-
-      .logo > svg {
-        margin-top: 36px;
-        animation: app-logo-spin infinite 20s linear;
-      }
-
-      @keyframes app-logo-spin {
-        from {
-          transform: rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
-      .app-footer {
-        font-size: calc(12px + 0.5vmin);
-        align-items: center;
-      }
-
-      .app-footer a {
-        margin-left: 5px;
+      ion-icon {
+        font-size: 200px;
+        color: pink;
+        background-color:yellow;
+        opacity:0;
       }
     `;
   }
 
   render() {
-    return html`
-      <main>
-        <div class="logo">${openWcLogo}</div>
-        <h1>My app</h1>
-
-        <p>Edit <code>src/LetterGame.js</code> and save to reload.</p>
-        <a
-          class="app-link"
-          href="https://open-wc.org/developing/#code-examples"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Code examples
-        </a>
-      </main>
-
-      <p class="app-footer">
-        🚽 Made with love by
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://github.com/open-wc"
-          >open-wc</a
-        >.
-      </p>
-    `;
+    return html`<div class="game">
+      <h1 class="letter">${this.letter}</h1>
+      <ion-icon name="happy-outline"></ion-icon>
+    </div>`;
   }
 }

@@ -1,3 +1,3 @@
 import { LetterGame } from './LetterGame.js';
 
-customElements.define('letter-game', LetterGame);
+customElements.define('zl-letter-game', LetterGame);
